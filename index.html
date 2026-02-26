@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparación práctica entre el régimen de bienes familiares</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+                        serif: ['-apple-system-ui-serif', 'ui-serif', 'Georgia', 'Cambria', '"Times New Roman"', 'Times', 'serif'],
+                    },
+                    colors: {
+                        sc: { light: '#eff6ff', border: '#bfdbfe', text: '#1e40af', icon: '#3b82f6', bg: '#f8fafc' },
+                        sp: { light: '#ecfdf5', border: '#a7f3d0', text: '#065f46', icon: '#10b981', bg: '#f8fafc' },
+                        cap: { light: '#fffbeb', border: '#fde68a', text: '#92400e', icon: '#f59e0b', bg: '#f8fafc' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f1f5f9;
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 32px 32px;
+            color: #334155;
+        }
+        
+        .matrix-row {
+            transition: all 0.4s ease-in-out;
+        }
+        
+        /* Ocultar filas completamente en lugar de solo atenuarlas */
+        .hidden-row {
+            display: none !important;
+        }
+        
+        .highlight-diff {
+            border-color: #fca5a5 !important;
+            background-color: #fff;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.08);
+        }
+
+        .highlight-diff .aspect-title { color: #dc2626; }
+        
+        .highlight-sim {
+            border-color: #86efac !important;
+            background-color: #fff;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.08);
+        }
+
+        .highlight-sim .aspect-title { color: #16a34a; }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        /* Estilos optimizados para Impresión y PDF */
+        @media print {
+            @page {
+                size: landscape;
+                margin: 1.2cm;
+            }
+            body {
+                background: white !important;
+                background-image: none !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                font-size: 11pt;
+            }
+            .no-print { display: none !important; }
+            
+            #matrix-container { gap: 0 !important; }
+            
+            .print-header-grid {
+                position: static !important;
+                border-bottom: 2px solid #cbd5e1 !important;
+                margin-bottom: 0 !important;
+                page-break-after: avoid;
+            }
+            
+            .print-header-grid > div {
+                border: 1px solid #e2e8f0 !important;
+                border-bottom: none !important;
+                box-shadow: none !important;
+                padding: 10px !important;
+                background-color: #f8fafc !important;
+            }
+
+            .matrix-row {
+                /* Evitar superposiciones y cortes en páginas */
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                display: block !important;
+                width: 100% !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                border: 1px solid #e2e8f0 !important;
+                border-top: none !important;
+                margin-bottom: 0 !important;
+            }
+            
+            .matrix-row > div {
+                display: flex !important;
+                flex-direction: row !important;
+                width: 100% !important;
+            }
+            
+            .matrix-row .lg\\:grid-cols-12 > div {
+                border-right: 1px solid #e2e8f0 !important;
+                padding: 12px 16px !important;
+                width: 25% !important; /* Fuerza 4 columnas iguales */
+                box-sizing: border-box;
+            }
+            .matrix-row .lg\\:grid-cols-12 > div:last-child {
+                border-right: none !important;
+            }
+
+            /* Tipografía de impresión */
+            h1 { font-size: 20pt !important; margin-bottom: 4pt !important; color: #0f172a !important; }
+            h2 { font-size: 14pt !important; margin-bottom: 2pt !important; color: #1e293b !important; }
+            p { font-size: 10pt !important; line-height: 1.4 !important; color: #334155 !important; }
+            .aspect-title { font-size: 11pt !important; color: #0f172a !important; }
+            
+            /* Ocultar iconos en impresión */
+            svg { display: none !important; }
+            .matrix-row .bg-slate-200 { display: none !important; }
+            .ml-11 { margin-left: 0 !important; margin-top: 0 !important; }
+        }
+    </style>
+</head>
+<body class="font-sans min-h-screen py-10 px-4 sm:px-6 lg:px-8">
+
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-semibold text-slate-900 mb-3 tracking-tight">Comparación práctica entre el régimen de bienes familiares</h1>
+            <p class="text-base text-slate-600 font-medium">
+                Elaborado por Carlos Mario Agamez Seña en Canva.
+            </p>
+        </div>
+
+        <!-- Controles de Interacción y Botón de Impresión -->
+        <div class="no-print flex flex-col md:flex-row justify-center items-center gap-3 mb-8 sticky top-4 z-50">
+            <div class="bg-white/90 backdrop-blur p-1.5 rounded-xl shadow-sm border border-slate-200 inline-flex overflow-x-auto max-w-full">
+                <button onclick="filterMatrix('all')" id="btn-all" class="filter-btn active px-4 py-2 rounded-lg font-semibold text-sm transition-colors bg-slate-800 text-white">
+                    Vista completa
+                </button>
+                <button onclick="filterMatrix('diff')" id="btn-diff" class="filter-btn px-4 py-2 rounded-lg font-medium text-sm transition-colors text-slate-600 hover:bg-slate-100">
+                    Acentuar diferencias
+                </button>
+                <button onclick="filterMatrix('sim')" id="btn-sim" class="filter-btn px-4 py-2 rounded-lg font-medium text-sm transition-colors text-slate-600 hover:bg-slate-100">
+                    Acentuar similitudes
+                </button>
+                <div class="w-px h-5 bg-slate-300 mx-2 self-center"></div>
+                <button onclick="window.print()" class="px-4 py-2 rounded-lg font-medium text-sm transition-colors text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-100 flex items-center gap-2">
+                    Guardar PDF
+                </button>
+            </div>
+        </div>
+
+        <!-- Contenedor Principal de la Matriz -->
+        <div class="flex flex-col gap-4 print:gap-0" id="matrix-container">
+            <!-- Headers de Columnas -->
+            <div class="hidden lg:grid grid-cols-12 gap-4 px-2 print:px-0 sticky top-20 z-40 print-header-grid">
+                <div class="col-span-3 pb-2 flex items-end">
+                    <span class="font-semibold text-slate-500 uppercase tracking-wider text-xs hidden print:block">Concepto a evaluar</span>
+                </div>
+                
+                <div class="col-span-3 bg-white border border-slate-200 rounded-lg p-4 shadow-sm text-center">
+                    <h2 class="font-semibold text-sc-text text-lg">Sociedad conyugal</h2>
+                    <span class="text-xs text-slate-500 font-medium tracking-wide mt-1 block">Matrimonio</span>
+                </div>
+
+                <div class="col-span-3 bg-white border border-slate-200 rounded-lg p-4 shadow-sm text-center">
+                    <h2 class="font-semibold text-sp-text text-lg">Sociedad patrimonial</h2>
+                    <span class="text-xs text-slate-500 font-medium tracking-wide mt-1 block">Unión de hecho</span>
+                </div>
+
+                <div class="col-span-3 bg-white border border-slate-200 rounded-lg p-4 shadow-sm text-center">
+                    <h2 class="font-semibold text-cap-text text-lg">Capitulaciones</h2>
+                    <span class="text-xs text-slate-500 font-medium tracking-wide mt-1 block">Acuerdo previo</span>
+                </div>
+            </div>
+
+            <!-- Filas Dinámicas -->
+            <div id="matrix-body" class="flex flex-col gap-4 print:gap-0 z-10">
+                <!-- Inyectado por JS -->
+            </div>
+            
+        </div>
+
+        <!-- Sección de Fuentes y Jurisprudencia -->
+        <div class="mt-12 pt-8 border-t border-slate-300 print:mt-6 print:pt-4 print:break-inside-avoid">
+            <h3 class="text-lg font-semibold text-slate-800 mb-4">Fuentes oficiales y jurisprudencia consultada</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
+                <div>
+                    <h4 class="font-semibold text-slate-700 border-b border-slate-200 pb-2 mb-3">Marco normativo</h4>
+                    <ul class="space-y-2 text-slate-600">
+                        <li><a href="https://www.suin-juriscol.gov.co/viewDocument.asp?ruta=Leyes/1653338" target="_blank" class="font-medium text-slate-800 hover:underline decoration-slate-400 cursor-pointer transition-all">Código Civil colombiano:</a> Arts. 180, 1771, 1772, 1773, 1781. Régimen tradicional.</li>
+                        <li><a href="https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=30896" target="_blank" class="font-medium text-slate-800 hover:underline decoration-slate-400 cursor-pointer transition-all">Ley 54 de 1990</a> (modificada por Ley 979 de 2005): Uniones maritales de hecho y sociedad patrimonial.</li>
+                        <li><a href="https://www.suin-juriscol.gov.co/viewDocument.asp?ruta=Leyes/1654261" target="_blank" class="font-medium text-slate-800 hover:underline decoration-slate-400 cursor-pointer transition-all">Ley 28 de 1932:</a> Administración y libre disposición de bienes en la pareja.</li>
+                        <li><a href="https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=258236" target="_blank" class="font-medium text-slate-800 hover:underline decoration-slate-400 cursor-pointer transition-all">Ley 2447 de 2025:</a> Prohibición del matrimonio infantil y exclusión absoluta de bienes en la masa social.</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-slate-700 border-b border-slate-200 pb-2 mb-3">Jurisprudencia de cierre</h4>
+                    <ul class="space-y-2 text-slate-600">
+                        <li><a href="https://prime.tirant.com/co/actualidad-prime/la-corte-suprema-de-justicia-redefine-los-efectos-legales-de-la-separacion-de-hecho-prolongada/" target="_blank" class="font-medium text-slate-800 hover:underline decoration-slate-400 cursor-pointer transition-all">Corte Suprema de Justicia (SC3085-2024):</a> Disolución automática de la sociedad conyugal por separación de hecho prolongada.</li>
+                        <li><a href="https://cortesuprema.gov.co/corte/wp-content/uploads/2021/07/SC2130-2021-2015-00085-01_1-1.pdf" target="_blank" class="font-medium text-slate-800 hover:underline decoration-slate-400 cursor-pointer transition-all">Corte Suprema de Justicia (SC2130-2021):</a> Inexistencia de las capitulaciones por falta de escritura pública.</li>
+                        <li><a href="https://www.corteconstitucional.gov.co/relatoria/2025/T-372-25.htm" target="_blank" class="font-medium text-slate-800 hover:underline decoration-slate-400 cursor-pointer transition-all">Corte Constitucional (T-372 de 2025):</a> Derecho a alimentos resarcitorios con perspectiva de género tras la disolución.</li>
+                        <li><a href="https://www.corteconstitucional.gov.co/relatoria/2014/c-278-14.htm" target="_blank" class="font-medium text-slate-800 hover:underline decoration-slate-400 cursor-pointer transition-all">Corte Constitucional (C-278 de 2014):</a> Igualdad de los sexos en la conformación del haber relativo y recompensas.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const matrixData = [
+            { 
+                aspect: "Origen normativo", 
+                category: "diff",
+                icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v13m0-13c-1.168-.776-2.754-1.253-4.5-1.253S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13c1.168-.776 2.754-1.253 4.5-1.253s3.332.477 4.5 1.253v13c-1.168-.776-2.754-1.253-4.5-1.253s-3.332.477-4.5 1.253"></path>',
+                desc: "Fuente legal que da vida a la figura jurídica.",
+                sc: "<strong>Art. 180 C.C.</strong><br/><span class='text-xs text-slate-500 mt-1 block'>Código Civil tradicional.</span>", 
+                sp: "<strong>Ley 54 de 1990</strong><br/><span class='text-xs text-slate-500 mt-1 block'>Modificada por la Ley 979 de 2005.</span>", 
+                cap: "<strong>Art. 1771 C.C.</strong><br/><span class='text-xs text-slate-500 mt-1 block'>Contrato solemne dependiente.</span>" 
+            },
+            { 
+                aspect: "Nacimiento de la sociedad", 
+                category: "diff",
+                icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>',
+                desc: "Momento exacto en que surte efectos patrimoniales.",
+                sc: "Inmediato. Al momento de la <strong>celebración del matrimonio</strong>.", 
+                sp: "Condicionado. Al cumplirse <strong>2 años</strong> de convivencia ininterrumpida.", 
+                cap: "Previo. Deben otorgarse <strong>antes</strong> de que nazca el vínculo." 
+            },
+            { 
+                aspect: "Prueba requerida", 
+                category: "diff",
+                icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
+                desc: "Documento idóneo para demostrar su existencia.",
+                sc: "Exclusivamente el <strong>registro civil de matrimonio</strong>.", 
+                sp: "Sentencia judicial, acta de conciliación o escritura pública.", 
+                cap: "Exclusivamente <strong>escritura pública</strong> (solemnidad esencial)." 
+            },
+            { 
+                aspect: "Estructura del haber", 
+                category: "diff",
+                icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>',
+                desc: "Cómo se compone la masa de bienes a repartir.",
+                sc: "<strong>Dual:</strong> Haber absoluto (entra definitivo) y haber relativo (genera deuda).", 
+                sp: "<strong>Único:</strong> Solo ganancias netas. No existe el haber relativo.", 
+                cap: "<strong>Voluntaria:</strong> A la carta. Se excluye lo pactado expresamente." 
+            },
+            { 
+                aspect: "Dinero previo a la unión", 
+                category: "diff",
+                icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
+                desc: "Qué pasa con los ahorros en efectivo que se tenían antes.",
+                sc: "Entra al haber relativo. La sociedad lo usa, pero lo devuelve (recompensa).", 
+                sp: "Es <strong>bien propio</strong> indiscutible. No entra ni genera deuda.", 
+                cap: "Según voluntad. Usualmente se excluye en el inventario." 
+            },
+            { 
+                aspect: "Valorización de inmuebles", 
+                category: "diff",
+                icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>',
+                desc: "El mayor valor adquirido por un bien propio.",
+                sc: "<strong>No entra.</strong> Solo entran frutos civiles o mejoras comprobadas.", 
+                sp: "<strong>Entra totalmente.</strong> La ley manda que el mayor valor se reparte.", 
+                cap: "Protegible. Se estipula que la valorización no ingresará." 
+            },
+            { 
+                aspect: "Regla de recompensas", 
+                category: "diff",
+                icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>',
+                desc: "Mecanismo para equilibrar patrimonios internamente.",
+                sc: "<strong>Esencial.</strong> Corazón de la liquidación para saldar cuentas cruzadas.", 
+                sp: "<strong>No existe</strong> orgánicamente al no haber masa relativa.", 
+                cap: "Inaplicable si el régimen es de separación total de bienes." 
+            },
+            { 
+                aspect: "Administración de bienes", 
+                category: "sim",
+                icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>',
+                desc: "Quién maneja los bienes durante la vigencia.",
+                sc: "Gestión separada (Ley 28 de 1932). Libre disposición personal.", 
+                sp: "Idéntico (remisión Ley 28). Libre administración y disposición.", 
+                cap: "Salvo pacto en contrario, se mantiene libre e independiente." 
+            },
+            { 
+                aspect: "Propósito y naturaleza", 
+                category: "sim",
+                icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>',
+                desc: "Fin último de la figura jurídica.",
+                sc: "Solidaridad familiar, socorro y equidad en el esfuerzo.", 
+                sp: "Solidaridad familiar, ayuda mutua y protección del trabajo.", 
+                cap: "Libertad, autonomía de la voluntad y previsión patrimonial." 
+            },
+            { 
+                aspect: "Prescripción de acciones", 
+                category: "diff",
+                icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
+                desc: "Tiempo límite para exigir la liquidación judicial.",
+                sc: "<strong>10 años</strong> (regla general civil) después de la disolución.", 
+                sp: "Súper exprés: <strong>1 año</strong> contado desde la separación definitiva.", 
+                cap: "La nulidad relativa prescribe en 4 años; la absoluta en 10." 
+            }
+        ];
+
+        const matrixBody = document.getElementById('matrix-body');
+
+        function renderMatrix() {
+            matrixBody.innerHTML = '';
+            matrixData.forEach((row) => {
+                const rowHTML = `
+                    <div class="matrix-row relative bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm" data-type="${row.category}">
+                        <div class="flex flex-col lg:grid lg:grid-cols-12">
+                            
+                            <div class="col-span-3 bg-slate-50 p-4 lg:p-5 flex flex-col justify-center border-b lg:border-b-0 lg:border-r border-slate-200">
+                                <div class="flex items-center gap-3 mb-1">
+                                    <div class="p-1.5 bg-slate-200 rounded text-slate-500 print:hidden">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">${row.icon}</svg>
+                                    </div>
+                                    <h3 class="aspect-title font-semibold text-[15px] text-slate-800">${row.aspect}</h3>
+                                </div>
+                                <p class="text-[13px] text-slate-500 leading-tight ml-9 print:ml-0">${row.desc}</p>
+                            </div>
+
+                            <div class="col-span-3 p-4 lg:p-5 border-b lg:border-b-0 lg:border-r border-slate-100 flex flex-col justify-center">
+                                <span class="lg:hidden text-[11px] font-bold text-slate-400 uppercase tracking-wide mb-1 block print:hidden">Sociedad conyugal</span>
+                                <p class="text-slate-700 text-[14px] leading-snug">${row.sc}</p>
+                            </div>
+
+                            <div class="col-span-3 p-4 lg:p-5 border-b lg:border-b-0 lg:border-r border-slate-100 flex flex-col justify-center bg-slate-50/50 print:bg-transparent">
+                                <span class="lg:hidden text-[11px] font-bold text-slate-400 uppercase tracking-wide mb-1 block print:hidden">Sociedad patrimonial</span>
+                                <p class="text-slate-700 text-[14px] leading-snug">${row.sp}</p>
+                            </div>
+
+                            <div class="col-span-3 p-4 lg:p-5 flex flex-col justify-center">
+                                <span class="lg:hidden text-[11px] font-bold text-slate-400 uppercase tracking-wide mb-1 block print:hidden">Capitulaciones</span>
+                                <p class="text-slate-700 text-[14px] leading-snug">${row.cap}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                matrixBody.innerHTML += rowHTML;
+            });
+        }
+
+        function filterMatrix(type) {
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-slate-800', 'text-white');
+                btn.classList.add('text-slate-600', 'bg-transparent');
+            });
+
+            const activeBtn = document.getElementById(`btn-${type}`);
+            activeBtn.classList.remove('text-slate-600', 'bg-transparent');
+            activeBtn.classList.add('bg-slate-800', 'text-white');
+
+            const rows = document.querySelectorAll('.matrix-row');
+            
+            rows.forEach(row => {
+                row.classList.remove('highlight-diff', 'highlight-sim', 'hidden-row');
+                
+                if (type === 'diff') {
+                    if (row.dataset.type === 'diff') {
+                        row.classList.add('highlight-diff');
+                    } else {
+                        // En lugar de oscurecer, ocultamos completamente para evitar huecos al imprimir
+                        row.classList.add('hidden-row');
+                    }
+                } else if (type === 'sim') {
+                    if (row.dataset.type === 'sim') {
+                        row.classList.add('highlight-sim');
+                    } else {
+                        row.classList.add('hidden-row');
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderMatrix();
+        });
+    </script>
+</body>
+</html>
